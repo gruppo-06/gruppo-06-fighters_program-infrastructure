@@ -1,0 +1,27 @@
+# Database and cache for local development. scripts/dev.sh starts the same containers without Compose,
+# so it works with plain Docker or Podman; use this file if you prefer `docker compose up -d`.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: fighters
+      POSTGRES_USER: fighters
+      POSTGRES_PASSWORD: fighters
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - fighters-dev-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fighters"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+volumes:
+  fighters-dev-pg:
+    name: fighters-dev-pg
